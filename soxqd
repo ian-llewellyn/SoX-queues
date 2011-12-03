@@ -1,0 +1,105 @@
+#!/bin/bash
+CONFIG_DIR=/home/ian/devel/processor
+SOX_QUEUE_EXEC=/home/ian/devel/processor/SoX-queue
+
+## Usage function
+usage() {
+	if [ ! -z $1 ]; then
+		echo "Unrecognised command line parameter: $1" >&2
+	fi
+	echo "Usage: $0 <start|stop|status> [-c config_file]" >&2
+	return 0
+}
+
+start() {
+	echo -n "Starting SoX-queue: $config_file..."
+	$SOX_QUEUE_EXEC -c $config_file &
+	sleep 2
+	ps -p $! &> /dev/null && success || failure
+	echo
+	return 0
+}
+
+stop() {
+	echo -n "Stopping SoX-queue: $config_file..."
+	pkill -f "$SOX_QUEUE_EXEC -c $config_file" && success || failure
+	echo
+	return 0
+}
+
+status() {
+	echo -n "SoX-queue $config_file: "
+	pid=$(pgrep -f "$SOX_QUEUE_EXEC -c $config_file")
+	if [ -z "$pid" ]; then
+		failure
+	else
+		echo -n $pid
+		success
+	fi
+	return 0
+}
+
+# Just what is it that you want to do?
+case $1 in
+start)
+	callback=start
+	;;
+stop)
+	callback=stop
+	;;
+restart)
+	callback=restart
+	;;
+status)
+	callback=status
+	;;
+*)
+	usage
+	exit 1
+esac
+shift
+
+## Command line args
+while [ $# -ne 0 ]; do
+	case $1 in
+	-c)
+		shift
+		if [ -z "$1" ]; then
+			usage
+			exit 1
+		fi
+		config_files="$config_files $1"
+		;;
+	*)
+		usage $1
+		exit 1
+		;;
+	esac
+	shift
+done
+
+# Generate our own list of config files if none was provided
+if [ -z "$config_files" ]; then
+	for config_file in $CONFIG_DIR/*.conf ; do
+		config_files="$config_files $config_file"
+	done
+fi
+
+if [ "$callback" == "start" ]; then
+	for config_file in $config_files; do
+		start
+	done
+elif [ "$callback" == "stop" ]; then
+	for config_file in $config_files; do
+		stop
+	done
+elif [ "$callback" == "restart" ]; then
+	for config_file in $config_files; do
+		stop
+		start
+	done
+elif [ "$callback" == "status" ]; then
+	for config_file in $config_files; do
+		status
+	done
+fi

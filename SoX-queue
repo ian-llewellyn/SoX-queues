@@ -1,0 +1,98 @@
+#!/bin/bash
+
+## Usage function
+usage() {
+	if [ ! -z $1 ]; then
+		echo "Unrecognised command line parameter: $1" >&2
+	fi
+	echo "Usage: $0 <-c config_file>" >&2
+	return 0
+}
+
+## Command line args
+while [ $# -ne 0 ]; do
+	case $1 in
+	-c)
+		shift
+		config_file="$1"
+		;;
+	*)
+		usage $1
+		exit 1
+		;;
+	esac
+	shift
+done
+
+# Generate our own list of config files if none was provided
+if [ -z "$config_file" ]; then
+	usage
+	exit 1
+fi
+
+sox_do() {
+	# Move the source file into the processing directory
+	mv $QUEUE_DIR/$file $PROCESSING_DIR/$file
+	if [ $? -ne 0 ]; then
+		echo "There was a problem moving $QUEUE_DIR/$file for processing." >&2
+		continue
+	fi
+
+	$SOX_BIN $PROCESSING_DIR/$file -C 256 $OUTPUT_DIR/$file $EFFECTS
+	if [ $? -eq 0 ]; then
+		# Completed Successfully
+		echo "Successfully processed $file"
+		mv $PROCESSING_DIR/$file $SUCCESS_DIR/$file
+	else
+		# Did not complete Successfully
+		echo "Failed to process $file" >&2
+#		rm $OUTPUT_DIR/$file
+		mv $PROCESSING_DIR/$file $FAIL_DIR/$file
+	fi
+}
+
+## Read in the configuration file
+if [ -r "$config_file" ]; then
+	source "$config_file"
+else
+	echo "Could not read config file: $config_file" >&2
+	exit 1
+fi
+
+## Start monitoring the queue directory
+inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" | while read dir operation file ; do
+#	echo "Directory: $dir Operation: $operation File: $file" >&2 # DEBUG
+
+	# Is this an audio file?
+	if [[ "$file" != *.mp2 ]] && [[ "$file" != *.mp3 ]]; then
+		# No it's not! Skip
+		echo "Not an audio file: $file" >&2 # DEBUG
+		continue
+	fi
+
+	# Is there a need to double check this?
+	if [[ "$operation" != *CLOSE_WRITE* ]] && [[ "$operation" != *MOVED_TO* ]]; then
+		echo "Operation is not CLOSE_WRITE or MOVED_TO" >&2 # DEBUG
+		continue
+	fi
+
+	# How many SoX have we got on at the moment?
+	sox_instances=$(pgrep sox | wc -l)
+	if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
+	echo "SoX Instances: $sox_instances: $(pgrep sox)" >&2 # DEBUG
+
+	# Delay here until there is an opening for us..
+	until [ $sox_instances -lt $MAX_SOX_INSTANCES ]; do
+		echo "Waiting for other SoX instances to finish." >&2
+		sleep 30
+
+		# How many SoX have we got on at the moment?
+		sox_instances=$(pgrep sox | wc -l)
+		if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
+		echo "SoX Instances: $sox_instances: $(pgrep sox)" >&2 # DEBUG
+	done
+
+	# Process the audio
+	sox_do &
+
+done
