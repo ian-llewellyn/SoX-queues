@@ -1,0 +1,12 @@
+/etc/init.d/soxqd <start|stop|status> [-c <cfg_file>[ -c ...]]
+- If no config file is provided, soxqd searches /etc/soxqd/ for config files
+  and starts a SoX-queue for each one.
+
+/usr/local/bin/SoX-queue <-c cfg_file>
+- Starts inotifywait monitor on queue_dir provided in config file.
+- When a file is detected (CLOSE_WRITE or MOVED_TO), the file is checked to
+  see if it is audio.
+- If it is, the file is moved to the processing_dir and SoX is called.
+- SoX outputs to output_dir
+- If there is a problem, the source audio file is moved to failed_dir,
+  otherwise it's moved to success_dir
