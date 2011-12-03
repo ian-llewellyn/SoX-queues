@@ -26,7 +26,7 @@ usage() {
 
 start() {
 	echo -n "Starting SoX-queue: $(basename "$config_file")..."
-	runuser soxq -c "$SOX_QUEUE_EXEC -c $config_file" &
+	runuser -s /bin/bash soxq -c "$SOX_QUEUE_EXEC -c $config_file" &
 	sleep 1
 	ps -p $! &> /dev/null && success || failure
 	echo

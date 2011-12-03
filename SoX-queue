@@ -86,7 +86,7 @@ inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" | while read dir operatio
 	# Delay here until there is an opening for us..
 	until [ $sox_instances -lt $MAX_SOX_INSTANCES ]; do
 		echo "Waiting for other SoX instances to finish." >&2
-		sleep 30
+		sleep 5
 
 		# How many SoX have we got on at the moment?
 		sox_instances=$(pgrep sox | wc -l)
@@ -97,4 +97,6 @@ inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" | while read dir operatio
 	# Process the audio
 	sox_do &
 
+	# Give SoX a chance to start
+	usleep 500000
 done
