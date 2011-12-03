@@ -1,4 +1,5 @@
 #!/bin/bash
+SOX_BIN=/home/ian/devel/sox-14.3.2/src/sox
 
 ## Usage function
 usage() {
@@ -38,6 +39,7 @@ sox_do() {
 		continue
 	fi
 
+	# Get SoX to do it's thing
 	$SOX_BIN $PROCESSING_DIR/$file -C 256 $OUTPUT_DIR/$file $EFFECTS
 	if [ $? -eq 0 ]; then
 		# Completed Successfully

@@ -1,6 +1,20 @@
 #!/bin/bash
+#
+# /etc/rc.d/init.d/soxqd
+#
+# This is the service control script for the SoX-queue Daemon.
+#
+# chkconfig: 345 90 10
+# description: SoX-queue is a standalone script that uses inotify-tools \
+#              to start a SoX instance when a new audio file is dropped \
+#              into a queue directory. This service control script can be \
+#              used to start one or many SoX-queue directory monitors.
+# processname: SoX-queue
 CONFIG_DIR=/home/ian/devel/processor
 SOX_QUEUE_EXEC=/home/ian/devel/processor/SoX-queue
+
+# Source function library.
+. /etc/init.d/functions
 
 ## Usage function
 usage() {
@@ -12,23 +26,23 @@ usage() {
 }
 
 start() {
-	echo -n "Starting SoX-queue: $config_file..."
+	echo -n "Starting SoX-queue: $(basename "$config_file")..."
 	$SOX_QUEUE_EXEC -c $config_file &
-	sleep 2
+	sleep 1
 	ps -p $! &> /dev/null && success || failure
 	echo
 	return 0
 }
 
 stop() {
-	echo -n "Stopping SoX-queue: $config_file..."
+	echo -n "Stopping SoX-queue: $(basename "$config_file")..."
 	pkill -f "$SOX_QUEUE_EXEC -c $config_file" && success || failure
 	echo
 	return 0
 }
 
 status() {
-	echo -n "SoX-queue $config_file: "
+	echo -n "SoX-queue $(basename "$config_file"): "
 	pid=$(pgrep -f "$SOX_QUEUE_EXEC -c $config_file")
 	if [ -z "$pid" ]; then
 		failure
@@ -36,6 +50,7 @@ status() {
 		echo -n $pid
 		success
 	fi
+	echo
 	return 0
 }
 
