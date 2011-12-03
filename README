@@ -1,5 +1,35 @@
+SoX-queues is a small collection of scripts that implement audio processor
+queues. There are three scripts: a SysV init script called soxqd, the SoX-queue
+script that watches a directory for new audio to be processed by the SoX
+program (http://sox.sourceforge.net/) and an install/uninstall script to set
+everything up in the default places.
+
+With minor modifications, another application could be used to do the heavy
+lifting. I like SoX!
+
+Installing
+==========
+As root:
+# cd SoX-queues
+# ./install.sh
+
+Starting
+========
+# /etc/init.d/soxqd start
+
+Configure
+=========
+# vim /etc/SoX-queues/*.conf
+
+Uninstall
+=========
+As root:
+# SoX-queues/uninstall.sh
+
+Notes
+=====
 /etc/init.d/soxqd <start|stop|status> [-c <cfg_file>[ -c ...]]
-- If no config file is provided, soxqd searches /etc/soxqd/ for config files
+- If no config file is provided, soxqd searches /etc/SoX-queues/ for config files
   and starts a SoX-queue for each one.
 
 /usr/local/bin/SoX-queue <-c cfg_file>

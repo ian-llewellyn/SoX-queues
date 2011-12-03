@@ -9,9 +9,8 @@
 #              to start a SoX instance when a new audio file is dropped \
 #              into a queue directory. This service control script can be \
 #              used to start one or many SoX-queue directory monitors.
-# processname: SoX-queue
-CONFIG_DIR=/home/ian/devel/processor
-SOX_QUEUE_EXEC=/home/ian/devel/processor/SoX-queue
+CONFIG_DIR=/etc/SoX-queues
+SOX_QUEUE_EXEC=/usr/local/bin/SoX-queue
 
 # Source function library.
 . /etc/init.d/functions
@@ -27,7 +26,7 @@ usage() {
 
 start() {
 	echo -n "Starting SoX-queue: $(basename "$config_file")..."
-	$SOX_QUEUE_EXEC -c $config_file &
+	runuser soxq $SOX_QUEUE_EXEC -c $config_file &
 	sleep 1
 	ps -p $! &> /dev/null && success || failure
 	echo

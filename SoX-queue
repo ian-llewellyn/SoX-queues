@@ -18,7 +18,7 @@ while [ $# -ne 0 ]; do
 		config_file="$1"
 		;;
 	*)
-		usage $1
+		usage "$1"
 		exit 1
 		;;
 	esac
