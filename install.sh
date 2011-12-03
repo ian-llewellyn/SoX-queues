@@ -36,7 +36,7 @@ EOF
 	cp -v SoX-queue /usr/local/bin/SoX-queue
 	mkdir -v /etc/SoX-queues
 	cp -v service1.conf service2.conf /etc/SoX-queues
-	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
+	useradd -d /var/SoX-queues -r soxq && echo "added user: soxq"
 	install -o soxq -m 755 -v -d /var/SoX-queues/{queue{1,2},processing,output,completed,failed}
 
 	popd &> /dev/null
