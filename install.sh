@@ -39,6 +39,9 @@ EOF
 	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
 	install -o soxq -m 755 -v -d /var/SoX-queues/{queue{1,2},processing,output,completed,failed}
 
+	echo "Note: inotify-tools and SoX must be installed on the system in"
+	echo "order for the SoX-queue program to work."
+
 	popd &> /dev/null
 elif [ "$exec_name" == "uninstall.sh" ]; then
 	## UNINSTALL
