@@ -1,5 +1,5 @@
 #!/bin/bash
-SOX_BIN=/home/ian/devel/sox-14.3.2/src/sox
+SOX_BIN=/usr/local/bin/sox
 
 ## Usage function
 usage() {

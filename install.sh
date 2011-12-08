@@ -28,7 +28,7 @@ This is what's about to happen to your system:
 EOF
 	read -p "Do you want to proceed? Y/N: " answer
 
-	if [ "${answer^^[y]}" != "Y" ]; then
+	if [ "${answer/y/Y}" != "Y" ]; then
 		exit 1
 	fi
 
@@ -55,7 +55,7 @@ and leave /etc/SoX-queues and it's contents intact.
 EOF
 	read -p "Do you want to proceed? Y/N: " answer
 
-	if [ "${answer^^[y]}" != "Y" ]; then
+	if [ "${answer/y/Y}" != "Y" ]; then
 		exit 1
 	fi
 
