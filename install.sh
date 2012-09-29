@@ -18,13 +18,7 @@ This is what's about to happen to your system:
 # mkdir /etc/SoX-queues
 # cp service1.conf service2.conf /etc/SoX-queues
 # useradd -d /var/SoX-queues -r -s /sbin/nologin soxq
-# mkdir /var/SoX-queues
-#       /var/SoX-queues/queue1
-#       /var/SoX-queues/queue2
-#       /var/SoX-queues/processing
-#       /var/SoX-queues/output
-#       /var/SoX-queues/completed
-#       /var/SoX-queues/failed
+# mkdir -pv /var/SoX-queues/{light,talk,urban}/{complete,failed,output,processing}
 EOF
 	read -p "Do you want to proceed? Y/N: " answer
 
