@@ -35,7 +35,8 @@ start() {
 
 stop() {
 	echo -n "Stopping SoX-queue: $(basename "$config_file")..."
-	pkill -f "$SOX_QUEUE_EXEC -c $config_file" && success || failure
+	source "$config_file"
+	pkill -f "inotifywait .* $QUEUE_DIR" && success || failure
 	echo
 	return 0
 }

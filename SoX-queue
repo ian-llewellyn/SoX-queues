@@ -39,39 +39,55 @@ sox_do() {
 		continue
 	fi
 
+	IN_FILE=$PROCESSING_DIR/$file
+	OUT_FILE=$OUTPUT_DIR/.$file
+
 	# Get SoX to do it's thing
-	$SOX_BIN $EFFECTS_FILE $PROCESSING_DIR/$file -C 256 $OUTPUT_DIR/$file $EFFECTS
+	#echo $SOX_BIN $GL_OPTS $EFFECTS_FILE $IN_OPTS $IN_FILE $OUT_OPTS $OUT_FILE $EFFECTS	# DEBUG
+	$SOX_BIN $GL_OPTS $EFFECTS_FILE $IN_OPTS $IN_FILE $OUT_OPTS $OUT_FILE $EFFECTS
 	if [ $? -eq 0 ]; then
 		# Completed Successfully
 		echo "Successfully processed $file"
+		mv $OUT_FILE $OUTPUT_DIR/$file	# Remove the '.'
 		mv $PROCESSING_DIR/$file $SUCCESS_DIR/$file
 	else
 		# Did not complete Successfully
 		echo "Failed to process $file" >&2
-#		rm $OUTPUT_DIR/$file
-		mv $PROCESSING_DIR/$file $FAIL_DIR/$file
+		test -f $OUT_FILE && rm $OUT_FILE
+		mv $PROCESSING_DIR/$file $FAILED_DIR/$file
 	fi
 }
 
+sox_availability() {
+	# Is MAX_SOX_INSTANCES already (b)reached?
+	sox_instances=$(pgrep $SOX_BIN | wc -l)
+	if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
+	echo "SoX Instances: $sox_instances: $(pgrep $SOX_BIN)" >&2 # DEBUG
+
+	test $sox_instances -lt $MAX_SOX_INSTANCES
+	return $?
+}
+
 ## Read in the configuration file
-if [ -r "$config_file" ]; then
+if [ ! -r "$config_file" ]; then
+	echo "Could not read config file: $config_file" >&2
+	exit 1
+else
 	source "$config_file"
 	if [ ! -z "$EFFECTS_FILE" ]; then
 		EFFECTS_FILE="--effects-file $EFFECTS_FILE"
 	fi
-else
-	echo "Could not read config file: $config_file" >&2
-	exit 1
 fi
 
 ## Start monitoring the queue directory
-inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" | while read dir operation file ; do
+inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" |
+while read dir operation file ; do
 #	echo "Directory: $dir Operation: $operation File: $file" >&2 # DEBUG
 
-	# Is this an audio file?
-	if [[ "$file" != *.mp2 ]] && [[ "$file" != *.mp3 ]]; then
-		# No it's not! Skip
-		echo "Not an audio file: $file" >&2 # DEBUG
+	# Is this a dot file?
+	if [[ "$file" == .* ]]; then
+		# Yes it is! Skip
+		echo "Not processing dot file: $file" >&2 # DEBUG
 		continue
 	fi
 
@@ -81,20 +97,10 @@ inotifywait -m -e CLOSE_WRITE -e MOVED_TO "$QUEUE_DIR" | while read dir operatio
 		continue
 	fi
 
-	# How many SoX have we got on at the moment?
-	sox_instances=$(pgrep sox | wc -l)
-	if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
-	echo "SoX Instances: $sox_instances: $(pgrep sox)" >&2 # DEBUG
-
 	# Delay here until there is an opening for us..
-	until [ $sox_instances -lt $MAX_SOX_INSTANCES ]; do
+	until sox_availability; do
 		echo "Waiting for other SoX instances to finish." >&2
 		sleep 5
-
-		# How many SoX have we got on at the moment?
-		sox_instances=$(pgrep sox | wc -l)
-		if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
-		echo "SoX Instances: $sox_instances: $(pgrep sox)" >&2 # DEBUG
 	done
 
 	# Process the audio

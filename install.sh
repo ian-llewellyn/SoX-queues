@@ -35,9 +35,13 @@ EOF
 	cp -v soxqd /etc/rc.d/init.d/soxqd
 	cp -v SoX-queue /usr/local/bin/SoX-queue
 	mkdir -v /etc/SoX-queues
-	cp -v service1.conf service2.conf /etc/SoX-queues
+	for queue_name in light talk urban; do
+		sed "s/\$queue_name/$queue_name/g" queue.conf > /etc/SoX-queues/$queue_name.conf
+		cp -v queue.efx /etc/SoX-queues/$queue_name.efx
+		mkdir -pv /var/SoX-queues/$queue_name/{complete,failed,output,processing}
+	done
 	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
-	install -o soxq -m 755 -v -d /var/SoX-queues/{queue{1,2},processing,output,completed,failed}
+	chown -R soxqd:soxqd /var/SoX-queues
 
 	echo "Note: inotify-tools and SoX must be installed on the system in"
 	echo "order for the SoX-queue program to work."
