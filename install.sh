@@ -35,7 +35,7 @@ EOF
 		mkdir -pv /var/SoX-queues/$queue_name/{complete,failed,output,processing}
 	done
 	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
-	chown -R soxqd:soxqd /var/SoX-queues
+	chown -R soxq:soxq /var/SoX-queues
 
 	echo "Note: inotify-tools and SoX must be installed on the system in"
 	echo "order for the SoX-queue program to work."
