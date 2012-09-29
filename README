@@ -35,8 +35,8 @@ Notes
 /usr/local/bin/SoX-queue <-c cfg_file>
 - Starts inotifywait monitor on queue_dir provided in config file.
 - When a file is detected (CLOSE_WRITE or MOVED_TO), the file is checked to
-  see if it is audio.
-- If it is, the file is moved to the processing_dir and SoX is called.
+  see if it is a dot file.
+- If it is not, the file is moved to the processing_dir and SoX is called.
 - SoX outputs to output_dir
 - If there is a problem, the source audio file is moved to failed_dir,
   otherwise it's moved to success_dir
