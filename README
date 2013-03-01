@@ -29,8 +29,8 @@ As root:
 Notes
 =====
 /etc/init.d/soxqd <start|stop|status> [-c <cfg_file>[ -c ...]]
-- If no config file is provided, soxqd searches /etc/SoX-queues/ for config files
-  and starts a SoX-queue for each one.
+- If no config file is provided, soxqd searches /etc/SoX-queues/ for config
+  files and starts a SoX-queue for each one.
 
 /usr/local/bin/SoX-queue <-c cfg_file>
 - Starts inotifywait monitor on queue_dir provided in config file.
