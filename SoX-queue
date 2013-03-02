@@ -60,9 +60,9 @@ sox_do() {
 
 sox_availability() {
 	# Is MAX_SOX_INSTANCES already (b)reached?
-	sox_instances=$(pgrep $SOX_BIN | wc -l)
+	sox_instances=$(pgrep -f $SOX_BIN | wc -l)
 	if [ -z "$sox_instances" ]; then sox_instances=0 ; fi
-	echo "SoX Instances: $sox_instances: $(pgrep $SOX_BIN)" >&2 # DEBUG
+	echo "SoX Instances: $sox_instances: $(pgrep -f $SOX_BIN)" >&2 # DEBUG
 
 	test $sox_instances -lt $MAX_SOX_INSTANCES
 	return $?
