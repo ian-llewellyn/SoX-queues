@@ -16,8 +16,8 @@ This is what's about to happen to your system:
 # cp soxqd /etc/rc.d/init.d/soxqd
 # cp SoX-queue /usr/local/bin/SoX-queue
 # mkdir /etc/SoX-queues
-# cp service1.conf service2.conf /etc/SoX-queues
-# useradd -d /var/SoX-queues -r -s /sbin/nologin soxq
+# Create configuration files in: /etc/SoX-queues
+# useradd --home /var/SoX-queues --system --shell /sbin/nologin soxq
 # mkdir -pv /var/SoX-queues/{light,talk,urban}/{complete,failed,output,processing}
 EOF
 	read -p "Do you want to proceed? Y/N: " answer
@@ -34,7 +34,7 @@ EOF
 		cp -v queue.efx /etc/SoX-queues/$queue_name.efx
 		test -d /var/SoX-queues/$queue_name || mkdir -pv /var/SoX-queues/$queue_name/{complete,failed,output,processing}
 	done
-	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
+	useradd --home /var/SoX-queues --system --shell /sbin/nologin soxq && echo "added user: soxq"
 	chown -R soxq:soxq /var/SoX-queues
 
 	echo "Note: inotify-tools and SoX must be installed on the system in"
