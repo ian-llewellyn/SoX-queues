@@ -28,11 +28,11 @@ EOF
 
 	cp -v soxqd /etc/rc.d/init.d/soxqd
 	cp -v SoX-queue /usr/local/bin/SoX-queue
-	mkdir -v /etc/SoX-queues
+	test -d /etc/SoX-queues || mkdir -v /etc/SoX-queues
 	for queue_name in light talk urban; do
 		sed "s/\$queue_name/$queue_name/g" queue.conf > /etc/SoX-queues/$queue_name.conf
 		cp -v queue.efx /etc/SoX-queues/$queue_name.efx
-		mkdir -pv /var/SoX-queues/$queue_name/{complete,failed,output,processing}
+		test -d /var/SoX-queues/$queue_name || mkdir -pv /var/SoX-queues/$queue_name/{complete,failed,output,processing}
 	done
 	useradd -d /var/SoX-queues -r -s /sbin/nologin soxq && echo "added user: soxq"
 	chown -R soxq:soxq /var/SoX-queues
